@@ -1,0 +1,38 @@
+version: '3.9'
+networks:
+  intranet:
+    external: true 
+services:
+  keycloak:
+    image: jboss/keycloak
+    container_name: keycloak
+    restart: always
+    networks:
+      - intranet
+    environment: 
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      PROXY_ADDRESS_FORWARDING: "true"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.rule=Host(`auth.example.com`)"
+      - "traefik.http.routers.keycloak.tls=true"
+      - "traefik.http.routers.keycloak.tls.certresolver=leresolver"
+  traefik-forward-auth:
+    image: thomseddon/traefik-forward-auth
+    container_name: traefik-forward-auth
+    restart: always
+    networks: 
+      - intranet
+    environment:
+      - DEFAULT_PROVIDER=oidc
+      - PROVIDERS_OIDC_ISSUER_URL=https://auth.example.com/auth/realms/example
+      - PROVIDERS_OIDC_CLIENT_ID=traefik
+      - PROVIDERS_OIDC_CLIENT_SECRET=7afb20e5-74f3-4909-a55b-29c506fc1dc1
+      - SECRET=ovnenwonroevnponpoi
+      - LOG_LEVEL=debug
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+      - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"

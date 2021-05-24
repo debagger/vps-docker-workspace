@@ -1,0 +1,31 @@
+version: "3.9"
+volumes:
+  codeserverdata:
+  codeappdir:
+networks:
+  intranet:
+    external: true 
+services:
+  code-server:
+    image: ghcr.io/linuxserver/code-server
+    container_name: code-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - SUDO_PASSWORD=password #optional
+      - PROXY_DOMAIN=code.example.com
+    volumes:
+      - codeserverdata:/config
+      - codeappdir:/app
+    extra_hosts:
+      host.docker.internal: host-gateway
+    restart: always
+    networks:
+      - intranet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.code.rule=Host(`code.example.com`)"
+      - "traefik.http.routers.code.tls=true"
+      - "traefik.http.routers.code.tls.certresolver=leresolver"
+      - "traefik.http.routers.code.middlewares=traefik-forward-auth"
