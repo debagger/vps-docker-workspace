@@ -14,7 +14,7 @@ services:
       - --log.level=INFO
       - --certificatesresolvers.leresolver.acme.httpchallenge=true
       - --certificatesresolvers.leresolver.acme.email=user@usermail.com
-      - --certificatesresolvers.leresolver.acme.storage=./acme.json
+      - --certificatesresolvers.leresolver.acme.storage=/acme.json
       - --certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
