@@ -5,7 +5,6 @@ services:
   traefik:
     container_name: traefik
     image: "traefik:latest"
-    container_name: traefik
     command:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
